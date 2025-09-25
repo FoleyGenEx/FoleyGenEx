@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="FoleyGenEx">
+    <meta property="og:title" content="FoleyGenEx"/>
+    <meta property="og:description" content="FoleyGenEx: Unified Video-to-Audio Generation with Multi-Modal Control, Temporal Alignment, and Semantic Precision"/>
+    <meta property="og:url" content="https://foleygenex.github.io/FoleyGenEx/"/>
+    <meta property="og:image" content="content/image/icon.png"/>
+    <meta property="og:image:width" content="1200"/>
+    <meta property="og:image:height" content="630"/>
+    <meta name="twitter:title" content="FoleyGenEx">
+    <meta name="twitter:description" content="FoleyGenEx: Unified Video-to-Audio Generation with Multi-Modal Control, Temporal Alignment, and Semantic Precision">
+    <meta name="twitter:image" content="content/image/icon.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="keywords" content="Video-to-Audio">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FoleyGenEx</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="content/image/icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="static/css/index.css">
+    <link rel="preload" href="static/css/bulma.min.css" as="style">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" as="style">
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style">
+    <link rel="preload" href="static/css/index.css" as="style">
+    <style>
+        .video-container {
+            width: 100%;
+            position: relative;
+            margin-bottom: 8px;
+            overflow: hidden; 
+            background-color: #000; 
+        }
+        .big-video, .mid-video, .small-video {
+            width: 100%; 
+            height: auto; 
+            max-height: 400px; 
+            object-fit: contain; 
+            display: block; 
+        }
+        .video-item {
+            display: flex;
+            gap: 0px;
+            margin-bottom: 2em;
+        }
+         .video-item .column {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column; 
+        }
+        .video-item .column:only-child {
+            width: 50%;
+        }
+         .caption {
+            margin-top: 8px;
+            font-size: 1.2em; 
+            font-weight: bold; 
+            text-align: left;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .big-video, .mid-video, .small-video {
+                max-height: 300px; 
+            }
+        }
+        @media (max-width: 1200px) {
+            .video-item {
+                gap: 12px;
+            }
+        }
+        @media (max-width: 768px) {
+            .video-item {
+                flex-direction: column; 
+                gap: 16px;
+            }
+            .caption {
+                font-size: 1.1em; 
+                font-weight: bold;
+                margin-top: 4px;
+            }
+        }
+        .card-section {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1), 
+                        0 3px 6px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff;
+        }
+        .sub-module {
+            border: 2px solid #666;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+        table {
+            border-collapse: collapse; 
+            width: 100%;
+        }
+        th, td {
+            border: 2px solid #000; 
+            padding: 10px; 
+        }
+        th {
+            font-weight: bold; 
+            background-color: #f0f0f0; 
+        }
+        td {
+            color: #333; 
+        }
+        section {
+        margin-top: 0 !important; 
+        margin-bottom: 0 !important; 
+        }
+        section.hero,
+        section.section.hero.is-light {
+        margin-top: 0 !important;  
+        margin-bottom: 0 !important; 
+        padding-top: 0rem !important; 
+        padding-bottom: 0rem !important; 
+        }
+
+    </style>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWX46EFS5E"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JWX46EFS5E');
+    </script>
+</head>
+<body>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+    </nav>
+    <section class="hero">
+        <div class="hero-body">
+            <!-- <div class="container is-max-desktop"> -->
+                <div class="card-section">
+                <div class="columns is-centered">
+                    <div class="column has-text-centered">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+                            <img src="content/image/icon.png" alt="FoleyGenEx Icon" style="height: 180px; width: auto;">
+                            <h2 class="title is-1 publication-title">FoleyGenEx: Unified Video-to-Audio Generation with Multi-Modal Control, Temporal Alignment, and Semantic Precision</h2>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            <!-- </div> -->
+        </div>
+    </section>
+
+    <!-- Abstract -->
+    <section class="section hero is-light">
+        <!-- <div class="container is-max-desktop"> -->
+            <div class="card-section">
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                    <h2 class="title is-3">Abstract</h2>
+                    <div class="content has-text-justified">
+                        <strong>
+                        <p style="font-size: 1.2em;">
+                            We introduce FoleyGenEx, a unified framework for video-to-audio (VTA) generation that integrates multi-modal control, frame-level temporal alignment, and fine-grained semantic expressivity, enabling synchronized, versatile, and expressive audio synthesis across diverse tasks. Existing VTA methods either offer multi-modal control with weak temporal alignment or achieve strong alignment while lacking reference audio conditioning and semantic precision. FoleyGenEx bridges this gap through three key innovations: a conditional injection mechanism enabling audio-controlled VTA and Foley extension, a multi-modal dynamic masking strategy preserving synchronization during multi-modal training, and an adverb-based data augmentation algorithm leveraging signal processing and large language models to enrich audio representations and textual supervision with nuanced semantic cues. Experiments on AudioCaps, VGGSound, and Greatest Hits show that FoleyGenEx delivers competitive performance in controllable VTA generation, achieving strong temporal fidelity, versatile multi-modal control, and fine-grained semantic precision compared to existing methods.
+                        </p>
+                        </strong>
+                    </div>
+                </div>
+            </div>
+            </div>
+        <!-- </div> -->
+    </section>
+
+    <!-- Method -->
+    <section class="hero is-small">
+        <div class="hero-body">
+            <!-- <div class="container is-max-desktop"> -->
+                <div class="card-section">
+                <h2 class="title is-3">Method</h2>
+                <div class="image-container">
+                    <div style="display: flex; justify-content: center; align-items: center;">
+                        <img src="content/image/f1.jpg" alt="图片1" class="layout-image", style="width: 50%; height: 50%;">
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center">
+                        <strong>
+                        <p style="font-size: 1.2em;">
+                            Figure 1: FoleyGenEx supports a range of multi-modal controlled audio generation tasks, including Text-to-Audio (TTA), basic Video-to-Audio (VTA), Text-Controlled VTA (TC-VTA), Audio-Controlled VTA (AC-VTA), and Foley extension (FE). It unifies these tasks while achieving strong synchronization, versatile control, and expressive audio generation.
+                        </p>
+                        </strong>
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center;">
+                        <img src="content/image/f2.jpg" alt="图片2" class="layout-image", style="width: 50%; height: 80%;">
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center">
+                        <strong>
+                        <p style="font-size: 1.2em;">
+                            Figure 2: FoleyGenEx training framework.
+                        </p>
+                        </strong>
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center;">
+                    <img src="content/image/f3.jpg" alt="图片3" class="image-third", style="width: 50%; height: 50%;">
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center">
+                        <strong>
+                        <p style="font-size: 1.2em;">
+                            Figure 3: Multi-modal controlled audio generation tasks.
+                        </p>
+                        </strong>
+                    </div>
+                </div>
+                <div class="content has-text-justified">
+                    <strong>
+                    <p style="font-size: 1.2em;">
+                    </p>
+                    </strong>
+                </div>
+                </div>
+            <!-- </div> -->
+        </div>
+    </section>
+
+    <!-- Generated Videos Showcase -->
+    <section class="hero is-small is-light">
+        <div class="hero-body">
+            <!-- <div class="container"> -->
+                <div class="card-section">
+                <h2 class="title is-3">FoleyGenEx Demo Gallery</h2>
+                <!-- Text-Control Video-to-Audio -->
+                <div class="sub-module">
+                <div style="display: flex; justify-content: center;align-items: center; padding: 16px 0;">
+                    <h3 class="title is-4">Text-Control Video-to-Audio</h3>
+                </div>
+                <!-- 1: 鸟 -->
+                <!-- multifoely -->
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                    <h5 class="title is-4">MultiFoley <a href="https://ificl.github.io/MultiFoley/" target="_blank">[link]</a></h5>
+                </div>
+                <div class="video-item">
+                    <div class="column">
+                        <!-- <video class="video-player big-video" controls preload="auto"  data-src="content/video/multifoley/tc-v2a/1/bird-chirping.mp4"></video> -->
+                        <video class="video-player big-video" controls preload="auto">
+                            <source data-src="content/video/multifoley/tc-v2a/1/bird-chirping.webm" type="video/webm">
+                            <source data-src="content/video/multifoley/tc-v2a/1/bird-chirping.mp4" type="video/mp4">
+                        </video>
+                        <p class="caption">Bird chirping.</p>
+                    </div>
+                    <div class="column">
+                        <!-- <video class="video-player big-video" controls preload="auto"  data-src="content/video/multifoley/tc-v2a/1/male-speaking.mp4"></video> -->
+                        <video class="video-player big-video" controls preload="auto">
+                            <source data-src="content/video/multifoley/tc-v2a/1/male-speaking.webm" type="video/webm">
+                            <source data-src="content/video/multifoley/tc-v2a/1/male-speaking.mp4" type="video/mp4">
+                        </video>
+                        <p class="caption">Male speaking.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto"  data-src="content/video/multifoley/tc-v2a/1/rooster-crow.mp4"></video>
+                        <p class="caption">Rooster crowing.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/multifoley/tc-v2a/1/sheep.mp4"></video>
+                        <p class="caption">Sheep bleating.</p>
+                    </div>
+                </div>
+                <!-- ours -->
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                    <h5 class="title is-4">FoleyGenEx (Ours)</h5>
+                </div>
+                <div class="video-item">
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto"  data-src="content/video/tc-v2a/1/bird_chirping.mp4"></video>
+                        <p class="caption">Bird chirping.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto"  data-src="content/video/tc-v2a/1/male_speaking.mp4"></video>
+                        <p class="caption">Male speaking.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto"  data-src="content/video/tc-v2a/1/rooster_crowing.mp4"></video>
+                        <p class="caption">Rooster crowing.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/1/sheep_bleating.mp4"></video>
+                        <p class="caption">Sheep bleating.</p>
+                    </div>
+                </div>
+                <!-- 2: 猫 -->
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                    <h5 class="title is-4">MultiFoley</h5>
+                </div> 
+                <div class="video-item">
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/multifoley/tc-v2a/2/cat-meowing.mp4"></video>
+                        <p class="caption">Cat meowing.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/multifoley/tc-v2a/2/horse-neighing.mp4"></video>
+                        <p class="caption">Horse neighing.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/multifoley/tc-v2a/2/lion-roaring.mp4"></video>
+                        <p class="caption">Lion roaring.</p>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                    <h5 class="title is-4">FoleyGenEx (Ours)</h5>
+                </div>
+                <div class="video-item">
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/2/cat_meowing.mp4"></video>
+                        <p class="caption">Cat meowing.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/2/horse_neighing.mp4"></video>
+                        <p class="caption">Horse neighing.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/2/lion_roaring.mp4"></video>
+                        <p class="caption">Lion roaring.</p>
+                    </div>
+                </div>
+                <!-- 3: 键盘 -->
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                    <h5 class="title is-4">MultiFoley</h5>
+                </div>
+                <div class="video-item">
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/multifoley/tc-v2a/3/typewriter.mp4"></video>
+                        <p class="caption">Typewriter.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/multifoley/tc-v2a/3/piano.mp4"></video>
+                        <p class="caption">Playing piano.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/multifoley/tc-v2a/3/keyboard.mp4"></video>
+                        <p class="caption">Typing on computer keyboard.</p>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                    <h5 class="title is-4">FoleyGenEx (Ours)</h5>
+                </div>
+                <div class="video-item">
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/3/typewriter.mp4"></video>
+                        <p class="caption">Typewriter.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/3/playing_piano.mp4"></video>
+                        <p class="caption">Playing piano.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/3/typing_on_computer_keyboard.mp4"></video>
+                        <p class="caption">Typing on computer keyboard.</p>
+                    </div>
+                </div>
+                <!-- 4：小提琴 -->
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                    <h5 class="title is-4">MultiFoley</h5>
+                </div>
+                <div class="video-item">
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/multifoley/tc-v2a/4/cello.mp4"></video>
+                        <p class="caption">Playing cello.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/multifoley/tc-v2a/4/erhu.mp4"></video>
+                        <p class="caption">Playing erhu.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/multifoley/tc-v2a/4/chainsawing.mp4"></video>
+                        <p class="caption">Chainsawing trees.</p>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                    <h5 class="title is-4">FoleyGenEx (Ours)</h5>
+                </div>
+                <div class="video-item">
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/4/playing_cello.mp4"></video>
+                        <p class="caption">Playing cello.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/4/playing_erhu.mp4"></video>
+                        <p class="caption">Playing erhu.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/4/chainsawing trees.mp4"></video>
+                        <p class="caption">Chainsawing trees.</p>
+                    </div>
+                </div>
+                <div class="video-item">
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/5/cat_meowing.mp4"></video>
+                        <p class="caption">Cat meowing.</p>
+                    </div>
+                    <div class="column">
+                        <video class="video-player big-video" controls preload="auto" data-src="content/video/tc-v2a/5/tiger_roaring.mp4"></video>
+                        <p class="caption">Tiger roaring.</p>
+                    </div>
+                </div>
+               </div>
+                <!-- Audio-Control Video-to-Audio (Material) -->
+                <div class="sub-module">
+                <div style="display: flex; justify-content: center;align-items: center; padding: 16px 0;">
+                    <h3 class="title is-4">Audio-Control Video-to-Audio (Material)</h3>
+                </div>
+                <!-- 3: 敲书包 -->
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                <h5 class="title is-4"> MMAudio </h5>
+                </div>
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/3/hitting_bag.mp4"></video>
+                            <p class="caption">Reference Audio</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/mmaudio/1/chopping_to_hitting_bag.mp4"></video>
+                            <p class="caption">Result 1</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/mmaudio/1/hitting_metal_to_hitting_bag.mp4"></video>
+                            <p class="caption">Result 2</p>
+                        </div>
+                </div>
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                <h5 class="title is-4">FoleyGenEx (Ours)</h5>
+                </div>
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/3/hitting_bag.mp4"></video>
+                            <p class="caption">Reference Audio</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/3/chopping_to_hitting_bag.mp4"></video>
+                            <p class="caption">Result 1</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/3/hitting_metal_to_hitting_bag.mp4"></video>
+                            <p class="caption">Result 2</p>
+                        </div>
+                </div>
+                <!-- 4: 敲金属-->
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                <h5 class="title is-4"> MMAudio </h5>
+                </div>
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/4/hitting_metal.mp4"></video>
+                            <p class="caption">Reference Audio</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/mmaudio/2/chopping_to_hitting_metal.mp4"></video>
+                            <p class="caption">Result 1</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/mmaudio/2/hitting_bag_to_hitting_metal.mp4"></video>
+                            <p class="caption">Result 2</p>
+                        </div>
+                </div>
+                <div style="display: flex; justify-content: flex-start; align-items: center; padding: 16px 0;">
+                    <h5 class="title is-4">FoleyGenEx (Ours)</h5>
+                </div>
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/4/hitting_metal.mp4"></video>
+                            <p class="caption">Reference Audio</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/4/chopping_to_hitting_metal.mp4"></video>
+                            <p class="caption">Result 1</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/4/hitting_bag_to_hitting_metal.mp4"></video>
+                            <p class="caption">Result 2</p>
+                        </div>
+                </div>
+                <!-- 6:asmr-2 -->
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/6/reference.mp4"></video>
+                            <p class="caption">Reference Audio</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/6/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>    
+                <!-- 7:asmr-3 -->
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/7/reference.mp4"></video>
+                            <p class="caption">Reference Audio</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a/7/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>                
+                </div>
+                <!-- Audio-Control Video-to-Audio (Audio Event) -->
+                <div class="sub-module">
+                <div style="display: flex; justify-content: center;align-items: center; padding: 16px 0;">
+                     <h3 class="title is-4">Audio-Control Video-to-Audio (Audio Event)</h3>
+                </div>
+                <!-- 1:鸟 -->
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a2/1/bird-chirping.mp4"></video>
+                            <p class="caption">Reference Audio</p>
+                        </div>
+                         <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a2/1/cat-meowing_to_bird-chirping.mp4"></video>
+                            <p class="caption">Result 1</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a2/1/typewriter_to_bird-chirping.mp4"></video>
+                            <p class="caption">Result 2</p>
+                        </div>
+                </div>
+                <!-- 2:cello -->
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a2/2/cello.mp4"></video>
+                            <p class="caption">Reference Audio</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a2/2/bird-chirping_to_cello.mp4"></video>
+                            <p class="caption">Result 1</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a2/2/typewriter_to_cello.mp4"></video>
+                            <p class="caption">Result 2</p>
+                        </div>
+                </div>
+                <!-- 3:键盘 -->
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a2/3/typewriter.mp4"></video>
+                            <p class="caption">Reference Audio</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a2/3/bird-chirping_to_typewriter.mp4"></video>
+                            <p class="caption">Result 1</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/ac-v2a2/3/cello_to_typewriter.mp4"></video>
+                            <p class="caption">Result 2</p>
+                        </div>
+                </div>
+                </div>
+                <!-- Audio Continuation -->
+                <div class="sub-module">
+                <div style="display: flex; justify-content: center;align-items: center; padding: 16px 0;">
+                    <h3 class="title is-4">Audio Continuation</h3>
+                </div>
+                <!-- 1 -->
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/1/input.mp4"></video>
+                            <p class="caption">Input: Provides the first 5-second audio clip</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/1/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 2 -->
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/2/input.mp4"></video>
+                            <p class="caption">Input: Provides the first 5 - second audio clip</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/2/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 3 -->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/3/input.mp4"></video>
+                            <p class="caption">Input: Provides the first 5 - second audio clip</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/3/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 4 -->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/4/input.mp4"></video>
+                            <p class="caption">Input: Provides the first 5 - second audio clip</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/4/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 5 -->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/5/input.mp4"></video>
+                            <p class="caption">Input: Provides the first 5 - second audio clip</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/5/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 6 -->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/6/input.mp4"></video>
+                            <p class="caption">Input: Provides the first 5 - second audio clip</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/6/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 7 -->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/7/input.mp4"></video>
+                            <p class="caption">Input: Provides the first 5 - second audio clip</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/7/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 8 -->
+                 <div class="video-item">>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/8/input.mp4"></video>
+                            <p class="caption">Input: Provides the first 5 - second audio clip</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/8/result.mp4"></video>
+                            <p class="caption">Result</p>
+                    </div>
+                </div>
+                <!-- 9 -->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/9/input.mp4"></video>
+                            <p class="caption">Input: Provides the first 5 - second audio clip</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/va-cont/9/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                </div>
+                <!-- Editing -->
+                <div class="sub-module">
+                <div style="display: flex; justify-content: center;align-items: center; padding: 16px 0;">
+                    <h3 class="title is-4">Editing</h3>
+                </div>
+                <!-- 1 倒牛奶-->
+                <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/1/ori.mp4"></video>
+                            <p class="caption">Edit the 0-3s segment and input the text as "pouring milk"</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/1/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 2 老虎 -->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/2/ori.mp4"></video>
+                            <p class="caption">Regenerate the 7.5-10s segment based on the 0-7.5s segment</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/2/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 3 西瓜-->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/3/ori.mp4"></video>
+                            <p class="caption">Regenerate the 2-5s segment based on the rest of the segments</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/3/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 4 椰子水-->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/4/ori.mp4"></video>
+                            <p class="caption">Regenerate the 0-1.5s segment based on the rest of the segments</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/4/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 5 小溪 -->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/5/ori.mp4"></video>
+                            <p class="caption">Regenerate the 0-2s segment based on the rest of the segments</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/5/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 6 绿衣-->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/6/ori.mp4"></video>
+                            <p class="caption">Regenerate the 0-2s segment based on the rest of the segments</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/6/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                <!-- 7 佛像-->
+                 <div class="video-item">
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/7/ori.mp4"></video>
+                            <p class="caption">Regenerate the 0-5s segment based on the rest of the segments</p>
+                        </div>
+                        <div class="column">
+                            <video class="video-player big-video" controls preload="auto"  data-src="content/video/edit/7/result.mp4"></video>
+                            <p class="caption">Result</p>
+                        </div>
+                </div>
+                </div>
+                <div class="card-section">
+                <h2 class="title is-3">Prompts</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Propose</th>
+                            <th>Prompt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Speed Augmentation</td>
+                            <td>This sentence is a description of the sound content heard in the audio: <strong>{original caption}</strong>. The enhancement strategy applied to this audio is: <strong>{audio augmentation strategy}</strong>. The description of the original speed of this audio is: <strong>{adverb in the original caption}</strong>. Please rewrite the description of the sound considering this enhancement. Do not imagine non-existent sound content; avoid comparing with music characteristics if not relevant; exclude specific place names, people's names, or other proper nouns. The output caption should be within 30 words and be able to distinguish among the following three situations based on the enhanced sound: when the original speed was described as fast and enhanced by speeding up; when the original speed was described as fast but enhanced by slowing down or when the original speed was described as slow but enhanced by speeding up; when the original speed was described as slow and enhanced by slowing down. The rewritten caption should only describe the sound after enhancement without explicitly stating the enhancement strategy. Describe the speed in the rewritten caption based on the effect of applying the <strong>{audio augmentation strategy}</strong> to the <strong>{adverb in the original caption}</strong>. For example, when speeding up a slow-moving sound or slowing down a fast-moving sound, describe the speed as moderate; when speeding up a fast-moving sound, describe it as very fast; when slowing down a slow-moving sound, describe it as very slow.</td>
+                        </tr>
+                        <tr>
+                            <td>Distance Augmentation</td>
+                            <td>This sentence is a description of the sound content heard in the audio: <strong>{original caption}</strong>. The enhancement strategy applied to this audio is: <strong>{audio augmentation strategy}</strong>. When the enhancement strategy is marked as 'Far', it indicates that the enhanced audio has a significant amount of reverberation. In the rewritten caption, focus on expressing this characteristic of the sound. When the enhancement strategy is marked as 'Very Far', it means the enhanced audio gives the impression of being in the distance. The rewritten description should convey this sense of distance. Do not fabricate non-existent sound content; avoid making comparisons with music characteristics if they are not relevant; exclude specific place names, people's names, or other proper nouns. The output should be within 30 words. The rewritten caption should only describe the sound after enhancement without explicitly stating the enhancement strategy.</td>
+                        </tr>
+                        <tr>
+                            <td>Volume Dynamic Augmentation</td>
+                            <td>This sentence is a description of the sound content heard in the audio: <strong>{original caption}</strong>. The enhancement strategy applied to this audio is: <strong>{audio augmentation strategy}</strong>. If the enhancement strategy is 'Crescendo', rewrite the sound description to convey that the enhanced audio seems to approach from a distance with gradually increasing volume. If the strategy is 'Decrescendo', rewrite it to show that the enhanced audio appears to move away into the distance with gradually decreasing volume. Do not imagine non-existent sound content; avoid comparing with music characteristics if not relevant; exclude specific place names, people's names, or other proper nouns. The output should be within 30 words. The rewritten caption should only describe the sound after enhancement without explicitly stating the enhancement strategy.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            <!-- </div> -->
+        </div>
+        <div class="card-section">
+            <div class="container">
+                <div class="columns is-centered">
+                <!-- 将column is-8改为is-10，增加宽度；同时添加max-width: 1400px确保在宽屏上不过度拉伸 -->
+                <div class="column is-10" style="max-width: 1400px;">
+                    <h4 style="color: #333333;"><strong>Acknowledgements</strong></h4>
+                    <p style="color: #555555;">The videos in this demo page are sourced from the following:</p>
+                    <ul style="color: #555555; line-height: 1.6;">
+                    <li>Videos from the demo page of <a href="https://ificl.github.io/MultiFoley/" target="_blank" style="color: #2c3e50; text-decoration: underline;">MultiFoley</a></li>
+                    <li>Videos from <a href="https://app.klingai.com/" target="_blank" style="color: #2c3e50; text-decoration: underline;">kling</a></li>
+                    <li>Videos from <a href="https://andrewowens.com/vis/" target="_blank" style="color: #2c3e50; text-decoration: underline;">Greatest Hits Dataset</a></li>
+                    <li>Some videos crawled from the internet. These videos are used solely for demonstration purposes and we do not claim any copyright. If any content infringes upon your rights, please contact us and we will remove it immediately.</li>
+                    </ul>
+                </div>
+                </div>
+            </div>
+        </div>
+
+
+    </section>
+
+    <footer class="footer">
+    </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var videos = document.querySelectorAll('video[data-src]');
+            if ('IntersectionObserver' in window) {
+                let observer = new IntersectionObserver(function(entries, observer) {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            let video = entry.target;
+                            if (!video.src) {
+                                video.src = video.getAttribute('data-src');
+                            }
+                            observer.unobserve(video);
+                        }
+                    });
+                }, {threshold: 0.1});
+                videos.forEach(video => observer.observe(video));
+            } else {
+                videos.forEach(video => {
+                    video.src = video.getAttribute('data-src');
+                });
+            }
+            videos.forEach(function (video) {
+                video.addEventListener('play', function () {
+                    videos.forEach(function (otherVideo) {
+                        if (otherVideo !== video) {
+                            otherVideo.pause();
+                        }
+                    });
+                }, false);
+            });
+        });
+    </script>
+</body>
+</html>
